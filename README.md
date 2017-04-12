@@ -2,6 +2,18 @@
 
 ## Automatic diagram generation using PlantUML syntax
 
+## Features
+* Class, Abstract class and Interface drawing
+* Inheritance relations beetwen classes
+* Implementation relations beetwen classes and interfaces
+* Class Fields drawing
+
+## TODO
+* Method drawing
+* Composition relations
+* Agregation relations
+* Complex field types like Map
+
 ### Usage:
 
 ```sh
