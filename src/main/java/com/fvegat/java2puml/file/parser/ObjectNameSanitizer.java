@@ -1,10 +1,14 @@
 package com.fvegat.java2puml.file.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ObjectNameSanitizer {
     public static final String BOOLEAN = "boolean";
     public static final String FLOAT = "float";
     public static final String DOUBLE = "double";
     public static final String INT = "int";
+    public static final String VOID = "void";
 
     public static String convertFileNameToPackage(String fileName) {
         String packageName = fileName.replace("/", ".");
@@ -26,6 +30,8 @@ public class ObjectNameSanitizer {
             return DOUBLE;
         else if ("F".equals(fieldName))
             return FLOAT;
+        else if ("V".equals(fieldName))
+            return VOID;
         else if(signature == null) {
             String[] splittedAttributeName = fieldName.split("/");
             return splittedAttributeName[splittedAttributeName.length -1].replace(";", "");
@@ -35,5 +41,15 @@ public class ObjectNameSanitizer {
             return splittedAttributeName[splittedAttributeName.length -1].replace(";", "").replace("<", "").replace(">", "");
         }
 
+    }
+
+    public static String parseMethodReturnType(String methodDescription) {
+        Pattern pattern = Pattern.compile("\\(.*\\)(.+)");
+        Matcher matcher = pattern.matcher(methodDescription);
+
+        if (matcher.find())
+            return cleanFieldName(matcher.group(1), null);
+        else
+            return "";
     }
 }

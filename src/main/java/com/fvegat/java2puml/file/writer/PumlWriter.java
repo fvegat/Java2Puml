@@ -3,6 +3,7 @@ package com.fvegat.java2puml.file.writer;
 import com.fvegat.java2puml.model.DiagramObject;
 import com.fvegat.java2puml.model.class_object.ClassObject;
 import com.fvegat.java2puml.model.field_object.ClassField;
+import com.fvegat.java2puml.model.method_object.MethodObject;
 import com.fvegat.java2puml.model.relation_object.ClassRelation;
 
 import java.io.FileOutputStream;
@@ -51,6 +52,7 @@ public class PumlWriter {
         for (DiagramObject diagramObject: diagramObjects) {
             pumlFileWriter.append(diagramObject.draw());
             writeFields(diagramObject, pumlFileWriter);
+            writeMethods(diagramObject, pumlFileWriter);
             pumlFileWriter.append("\n");
         }
     }
@@ -68,8 +70,18 @@ public class PumlWriter {
     private void writeFields(DiagramObject diagramObject, OutputStreamWriter pumlFileWriter) throws IOException {
         pumlFileWriter.append(" {\n");
         for (DiagramObject classField: ((ClassObject)diagramObject).getFields()) {
-            pumlFileWriter.append(((ClassField)classField).draw());
+            pumlFileWriter.append(classField.draw());
             pumlFileWriter.append("\n");
+        }
+
+    }
+
+    private void writeMethods(DiagramObject diagramObject, OutputStreamWriter pumlFileWriter) throws IOException {
+        for (DiagramObject method: ((ClassObject)diagramObject).getMethods()) {
+            if (((MethodObject)method).isDrawable()) {
+                pumlFileWriter.append(method.draw());
+                pumlFileWriter.append("\n");
+            }
         }
         pumlFileWriter.append(" \n}");
     }

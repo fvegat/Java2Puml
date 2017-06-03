@@ -6,6 +6,8 @@ import com.fvegat.java2puml.model.class_object.ClassObject;
 import com.fvegat.java2puml.model.class_object.ClassObjectFactory;
 import com.fvegat.java2puml.model.field_object.ClassField;
 import com.fvegat.java2puml.model.field_object.ClassFieldFactory;
+import com.fvegat.java2puml.model.method_object.MethodObject;
+import com.fvegat.java2puml.model.method_object.MethodObjectFactory;
 import com.fvegat.java2puml.model.relation_object.ClassRelation;
 import com.fvegat.java2puml.model.relation_object.ImplementationRelation;
 import com.fvegat.java2puml.model.relation_object.InheritanceRelation;
@@ -48,13 +50,13 @@ public class JavaClassParser extends ClassVisitor {
 
         ClassRelation inheritanceRelation = new InheritanceRelation();
         inheritanceRelation.setRelation(ObjectNameSanitizer.cleanClassName(superName));
-        checkDrawableObjects(inheritanceRelation);
+        checkDrawableRelationObjects(inheritanceRelation);
         relations.add(inheritanceRelation);
 
         for (String interFace: interfaces) {
             ClassRelation implementationRelation = new ImplementationRelation();
             implementationRelation.setRelation(ObjectNameSanitizer.cleanClassName(interFace));
-            checkDrawableObjects(implementationRelation);
+            checkDrawableRelationObjects(implementationRelation);
             relations.add(implementationRelation);
         }
         this.currentClassObject.setRelations(relations);
@@ -73,13 +75,25 @@ public class JavaClassParser extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        MethodObject methodObject = MethodObjectFactory.getInstance(access);
+        methodObject.setName(name);
+        methodObject.setReturnType(ObjectNameSanitizer.parseMethodReturnType(desc));
+        checkDrawableMethods(methodObject);
+        currentClassObject.getMethods().add(methodObject);
         return super.visitMethod(access, name, desc, signature, exceptions);
     }
 
-    private void checkDrawableObjects(ClassRelation classRelation) {
+    private void checkDrawableRelationObjects(ClassRelation classRelation) {
         for (DiagramObject diagramObject: this.parsedClasses) {
             if (classRelation.getRelation().equals(((ClassObject)diagramObject).getName()))
                 classRelation.setDrawable(true);
         }
+    }
+
+    private void checkDrawableMethods(MethodObject methodObject) {
+        if (methodObject.getName().contains("<init>") || methodObject.getName().contains("<clinit>"))
+            methodObject.setDrawable(false);
+        else
+            methodObject.setDrawable(true);
     }
 }
