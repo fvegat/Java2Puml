@@ -5,6 +5,6 @@ import com.fvegat.java2puml.constant.ClassVisibilityTypes;
 public class PublicClassField extends ClassField {
     @Override
     public String draw() {
-        return ClassVisibilityTypes.PROTECTED + this.name + ": " + this.type;
+        return ClassVisibilityTypes.PUBLIC + this.name + ": " + this.type;
     }
 }
