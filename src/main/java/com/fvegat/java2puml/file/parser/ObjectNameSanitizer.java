@@ -1,5 +1,9 @@
 package com.fvegat.java2puml.file.parser;
 
+import com.fvegat.java2puml.model.field_object.ClassField;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,5 +55,17 @@ public class ObjectNameSanitizer {
             return cleanFieldName(matcher.group(1), null);
         else
             return "";
+    }
+
+    public static List<String> parseMethodArguments(String methodDescription) {
+        Pattern pattern = Pattern.compile("(\\[*L[^;]+;|\\[[ZBCSIFDJ]|[ZBCSIFDJ])");
+        Matcher matcher = pattern.matcher(methodDescription);
+
+        List<String> matches = new ArrayList<>();
+        while(matcher.find()) {
+            matches.add(cleanFieldName(matcher.group(), null));
+        }
+
+        return matches;
     }
 }

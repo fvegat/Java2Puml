@@ -1,32 +1,24 @@
 package com.fvegat.java2puml.model.method_object;
 
-import com.fvegat.java2puml.file.parser.ObjectNameSanitizer;
 import com.fvegat.java2puml.model.DiagramObject;
-import com.fvegat.java2puml.model.field_object.ClassField;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class MethodObject implements DiagramObject {
     protected String name;
     protected String returnType;
-    protected List<ClassField> arguments;
+    protected List<String> arguments;
     protected boolean drawable;
 
-    public MethodObject() {
-        this.arguments = new ArrayList<>();
-    }
-
     protected String drawArguments() {
-        String argumentsToDraw = " ";
+        String argumentsToDraw = "";
+        int trimIndex = 0;
+        for (String argument: arguments) {
+            argumentsToDraw += argument + ", ";
+            trimIndex = 2;
+        }
 
-        for (ClassField classField: arguments)
-            argumentsToDraw.concat(classField.getName()
-                    + ": "
-                    + ObjectNameSanitizer.cleanFieldName(classField.getName(), null)
-                    + ", ");
-
-        return argumentsToDraw.substring(0, argumentsToDraw.length() -1);
+        return argumentsToDraw.substring(0, argumentsToDraw.length()-trimIndex);
     }
 
     public String getName() {
@@ -45,11 +37,11 @@ public abstract class MethodObject implements DiagramObject {
         this.returnType = returnType;
     }
 
-    public List<ClassField> getArguments() {
+    public List<String> getArguments() {
         return arguments;
     }
 
-    public void setArguments(List<ClassField> arguments) {
+    public void setArguments(List<String> arguments) {
         this.arguments = arguments;
     }
 

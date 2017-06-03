@@ -8,9 +8,7 @@ import com.fvegat.java2puml.model.field_object.ClassField;
 import com.fvegat.java2puml.model.field_object.ClassFieldFactory;
 import com.fvegat.java2puml.model.method_object.MethodObject;
 import com.fvegat.java2puml.model.method_object.MethodObjectFactory;
-import com.fvegat.java2puml.model.relation_object.ClassRelation;
-import com.fvegat.java2puml.model.relation_object.ImplementationRelation;
-import com.fvegat.java2puml.model.relation_object.InheritanceRelation;
+import com.fvegat.java2puml.model.relation_object.*;
 import org.objectweb.asm.*;
 
 import java.io.File;
@@ -39,6 +37,7 @@ public class JavaClassParser extends ClassVisitor {
             classReader.accept(this, 0);
         }
 
+        postProcessRelations();
         return this.parsedClasses;
     }
 
@@ -70,6 +69,7 @@ public class JavaClassParser extends ClassVisitor {
         classField.setType(desc, signature);
 
         currentClassObject.getFields().add(classField);
+
         return super.visitField(access, name, desc, signature, value);
     }
 
@@ -78,9 +78,32 @@ public class JavaClassParser extends ClassVisitor {
         MethodObject methodObject = MethodObjectFactory.getInstance(access);
         methodObject.setName(name);
         methodObject.setReturnType(ObjectNameSanitizer.parseMethodReturnType(desc));
+        methodObject.setArguments(ObjectNameSanitizer.parseMethodArguments(desc));
         checkDrawableMethods(methodObject);
         currentClassObject.getMethods().add(methodObject);
         return super.visitMethod(access, name, desc, signature, exceptions);
+    }
+
+    private void postProcessRelations() {
+        for (DiagramObject classObject: parsedClasses) {
+            for (DiagramObject methodObject: ((ClassObject)classObject).getMethods()) {
+                if (((MethodObject)methodObject).getName().equals(((ClassObject)classObject).getName())) {
+                    CompositionRelation compositionRelation = new CompositionRelation();
+                    compositionRelation.setRelation(((MethodObject)methodObject).getName());
+                    compositionRelation.setDrawable(true);
+                    ((ClassObject)classObject).getRelations().add(compositionRelation);
+                }
+
+                for (String argument: ((MethodObject)methodObject).getArguments()) {
+                    if (argument.equals(((ClassObject)classObject).getName())) {
+                        DependencyRelation dependencyRelation = new DependencyRelation();
+                        dependencyRelation.setRelation(argument);
+                        dependencyRelation.setDrawable(true);
+                        ((ClassObject)classObject).getRelations().add(dependencyRelation);
+                    }
+                }
+            }
+        }
     }
 
     private void checkDrawableRelationObjects(ClassRelation classRelation) {
