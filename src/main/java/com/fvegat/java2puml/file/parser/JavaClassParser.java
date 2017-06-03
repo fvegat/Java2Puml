@@ -9,10 +9,7 @@ import com.fvegat.java2puml.model.field_object.ClassFieldFactory;
 import com.fvegat.java2puml.model.relation_object.ClassRelation;
 import com.fvegat.java2puml.model.relation_object.ImplementationRelation;
 import com.fvegat.java2puml.model.relation_object.InheritanceRelation;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,6 +69,11 @@ public class JavaClassParser extends ClassVisitor {
 
         currentClassObject.getFields().add(classField);
         return super.visitField(access, name, desc, signature, value);
+    }
+
+    @Override
+    public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+        return super.visitMethod(access, name, desc, signature, exceptions);
     }
 
     private void checkDrawableObjects(ClassRelation classRelation) {
